@@ -4,7 +4,7 @@
 
 ![version](https://img.shields.io/pypi/v/onlyfans-scraper) ![python3.8-3.9](https://img.shields.io/pypi/pyversions/onlyfans-scraper) ![downloads](https://img.shields.io/pypi/dm/onlyfans-scraper)
 
-A command-line program to download media, like posts, and more from creators on OnlyFans.
+A command-line program to download media, like and unlike posts, and more from creators on OnlyFans.
 
 <img src="https://raw.githubusercontent.com/Amenly/onlyfans-scraper/main/media/example.png" width="550">
 
