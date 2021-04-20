@@ -113,7 +113,7 @@ You will need to use your arrow keys to select an option:
 
 If you choose to download content, you will have three options: having a list of all of your subscriptions printed, manually entering a username, or scraping *all* accounts that you're subscribed to.
 
-<img src="https://raw.githubusercontent.com/Amenly/onlyfans-scraper/main/media/list_or_username.png">
+<img src="https://raw.githubusercontent.com/Amenly/onlyfans-scraper/main/media/list_or_username.png" width="550">
 
 ### Liking/Unliking Posts
 
