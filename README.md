@@ -10,7 +10,7 @@ A command-line program to download media, like and unlike posts, and more from c
 
 ## Installation
 
-You can install this program by entering the following in your console:
+You can install this program by entering the following in your terminal:
 
 ```
 pip install onlyfans-scraper
