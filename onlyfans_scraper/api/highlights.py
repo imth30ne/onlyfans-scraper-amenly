@@ -30,13 +30,16 @@ def scrape_highlights(headers, user_id) -> list:
 
 def parse_highlights(highlights: list) -> list:
     if not highlights:
-        return
+        return []
 
     highlight_ids = [highlight['id'] for highlight in highlights]
     return highlight_ids
 
 
 async def process_highlights_ids(headers, ids: list) -> list:
+    if not ids:
+        return []
+
     tasks = [scrape_story(headers, id_) for id_ in ids]
     results = await asyncio.gather(*tasks)
     return list(chain.from_iterable(results))
