@@ -35,13 +35,16 @@ async def process_urls(headers, username, model_id, urls):
 
         # Added pool limit:
         limits = httpx.Limits(max_connections=10, max_keepalive_connections=5)
-        async with httpx.AsyncClient(headers=headers, limits=limits) as c:
+        async with httpx.AsyncClient(headers=headers, limits=limits, timeout=None) as c:
             aws = [asyncio.create_task(
                 download(c, path, model_id, *url)) for url in separated_urls]
 
             with tqdm(desc='Files downloaded', total=len(aws), colour='cyan', leave=True) as bar:
                 for coro in asyncio.as_completed(aws):
-                    await coro
+                    try:
+                        await coro
+                    except Exception as e:
+                        print(e)
                     bar.update()
 
 
