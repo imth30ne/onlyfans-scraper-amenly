@@ -78,25 +78,34 @@ def process_profile(headers, username) -> list:
     return urls
 
 
-def process_areas(headers, username, model_id) -> list:
-    profile_urls = []
-    pinned_posts_urls = []
-    timeline_posts_urls = []
-    archived_posts_urls = []
-    highlights_urls = []
-    messages_urls = []
+def process_areas_all(headers, username, model_id) -> list:
+    profile_urls = process_profile(headers, username)
+    pinned_posts_urls = process_pinned_posts(headers, model_id)
+    timeline_posts_urls = process_timeline_posts(headers, model_id)
+    archived_posts_urls = process_archived_posts(headers, model_id)
+    highlights_urls = process_highlights(headers, model_id)
+    messages_urls = process_messages(headers, model_id)
 
+    combined_urls = profile_urls + pinned_posts_urls + timeline_posts_urls + \
+        archived_posts_urls + highlights_urls + messages_urls
+
+    return combined_urls
+
+
+def process_areas(headers, username, model_id) -> list:
     result_areas_prompt = prompts.areas_prompt()
 
     if 'All' in result_areas_prompt:
-        profile_urls = process_profile(headers, username)
-        pinned_posts_urls = process_pinned_posts(headers, model_id)
-        timeline_posts_urls = process_timeline_posts(headers, model_id)
-        archived_posts_urls = process_archived_posts(headers, model_id)
-        highlights_urls = process_highlights(headers, model_id)
-        messages_urls = process_messages(headers, model_id)
+        combined_urls = process_areas_all(headers, username, model_id)
 
     else:
+        profile_urls = []
+        pinned_posts_urls = []
+        timeline_posts_urls = []
+        archived_posts_urls = []
+        highlights_urls = []
+        messages_urls = []
+
         if 'Timeline' in result_areas_prompt:
             profile_urls = process_profile(headers, username)
             pinned_posts_urls = process_pinned_posts(headers, model_id)
@@ -111,28 +120,20 @@ def process_areas(headers, username, model_id) -> list:
         if 'Messages' in result_areas_prompt:
             messages_urls = process_messages(headers, model_id)
 
-    combined_urls = profile_urls + pinned_posts_urls + timeline_posts_urls + \
-        archived_posts_urls + highlights_urls + messages_urls
+        combined_urls = profile_urls + pinned_posts_urls + timeline_posts_urls + \
+            archived_posts_urls + highlights_urls + messages_urls
 
     return combined_urls
 
 
 def do_download_content(headers, username, model_id, ignore_prompt=False):
-    # If we shouldn't ignore the areas prompt:
-    if not ignore_prompt:
-        combined_urls = process_areas(headers, username, model_id)
-
-    # If we should ignore the areas prompt:
+    # If we should ignore the process_areas prompt:
+    if ignore_prompt:
+        combined_urls = process_areas_all(headers, username, model_id)
+    # Otherwise, display the prompt to the user
     else:
-        profile_urls = process_profile(headers, username)
-        pinned_posts_urls = process_pinned_posts(headers, model_id)
-        timeline_posts_urls = process_timeline_posts(headers, model_id)
-        archived_posts_urls = process_archived_posts(headers, model_id)
-        highlights_urls = process_highlights(headers, model_id)
-        messages_urls = process_messages(headers, model_id)
-
-        combined_urls = profile_urls + pinned_posts_urls + timeline_posts_urls + \
-            archived_posts_urls + highlights_urls + messages_urls
+        combined_urls = process_areas(headers, username, model_id)
+    # If we shouldn't ignore the areas prompt:
 
     asyncio.run(download.process_urls(
         headers,
