@@ -14,6 +14,7 @@ import sqlite3
 from itertools import chain
 
 from ..constants import configPath, databaseFile
+from ..utils import separate
 
 
 def create_database(model_id, path=None):
@@ -68,6 +69,11 @@ def write_from_foreign_database(results: list, model_id):
     # Create the database table in case it doesn't exist:
     create_database(model_id, database_path)
 
+    # Filter results to avoid adding duplicates to database:
+    media_ids = get_media_ids(model_id)
+    filtered_results = separate.separate_database_results_by_id(
+        results, media_ids)
+
     # Insert results into our database:
     with contextlib.closing(sqlite3.connect(database_path)) as conn:
         with contextlib.closing(conn.cursor()) as cur:
@@ -76,10 +82,10 @@ def write_from_foreign_database(results: list, model_id):
                 media_id, filename
             )
             VALUES (?, ?);"""
-            cur.executemany(model_insert_sql, results)
+            cur.executemany(model_insert_sql, filtered_results)
             conn.commit()
 
-    print('Migration complete.')
+    print(f'Migration complete. Migrated {len(filtered_results)} items.')
 
 
 def get_media_ids(model_id) -> list:
