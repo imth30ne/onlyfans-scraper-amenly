@@ -10,12 +10,15 @@ r"""
 import json
 import pathlib
 
+from .profiles import get_current_profile
 from .prompts import auth_prompt, ask_make_auth_prompt
 from ..constants import configPath, authFile
 
 
 def read_auth():
-    p = pathlib.Path.home() / configPath
+    profile = get_current_profile()
+
+    p = pathlib.Path.home() / configPath / profile
     if not p.is_dir():
         p.mkdir(parents=True, exist_ok=True)
 
@@ -32,7 +35,9 @@ def read_auth():
 
 
 def edit_auth():
-    p = pathlib.Path.home() / configPath
+    profile = get_current_profile()
+
+    p = pathlib.Path.home() / configPath / profile
     if not p.is_dir():
         p.mkdir(parents=True, exist_ok=True)
 
@@ -40,6 +45,8 @@ def edit_auth():
         with open(p / authFile, 'r') as f:
             auth = json.load(f)
         make_auth(p, auth)
+
+        print('Your `auth.json` file has been edited.')
     except FileNotFoundError:
         if ask_make_auth_prompt():
             make_auth(p)
