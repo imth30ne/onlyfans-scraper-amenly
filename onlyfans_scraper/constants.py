@@ -8,8 +8,10 @@ r"""
 """
 
 configPath = '.config/onlyfans-scraper'
+configFile = 'config.json'
 authFile = 'auth.json'
 databaseFile = 'models.db'
+mainProfile = 'main_profile'
 
 meEP = 'https://onlyfans.com/api2/v2/users/me'
 
@@ -46,4 +48,11 @@ usernameOrListChoices = {
     'Print a list of my subscriptions': 0,
     'Enter a username': 1,
     'Scrape all users that I\'m subscribed to': 2
+}
+profilesPromptChoices = {
+    'Change profiles': 0,
+    'Edit a profile name': 1,
+    'Create a profile': 2,
+    'Delete a profile': 3,
+    'View profiles': 4
 }
