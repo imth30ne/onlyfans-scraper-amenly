@@ -9,11 +9,13 @@ r"""
 
 import argparse
 import asyncio
+import os
+import platform
 
 from .api import highlights, me, messages, posts, profile, subscriptions
 from .db import operations
 from .interaction import like
-from .utils import auth, download, prompts
+from .utils import auth, download, profiles, prompts
 
 from revolution import Revolution
 
@@ -99,15 +101,15 @@ def process_areas(headers, username, model_id) -> list:
         combined_urls = process_areas_all(headers, username, model_id)
 
     else:
-        profile_urls = []
         pinned_posts_urls = []
         timeline_posts_urls = []
         archived_posts_urls = []
         highlights_urls = []
         messages_urls = []
 
+        profile_urls = process_profile(headers, username)
+
         if 'Timeline' in result_areas_prompt:
-            profile_urls = process_profile(headers, username)
             pinned_posts_urls = process_pinned_posts(headers, model_id)
             timeline_posts_urls = process_timeline_posts(headers, model_id)
 
@@ -189,19 +191,12 @@ def process_me(headers):
     return subscribe_count
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-e', '--edit', help='view or edit your current auth', action='store_true')
-    parser.add_argument(
-        '-u', '--username', help='scrape the content of a user', action='store_true')
-    args = parser.parse_args()
-    if args.edit:
-        pass
-    if args.username:
-        pass
+def process_prompts():
+    loop = process_prompts
 
+    profiles.print_current_profile()
     headers = auth.make_headers(auth.read_auth())
+
     result_main_prompt = prompts.main_prompt()
 
     if result_main_prompt == 0:
@@ -263,9 +258,66 @@ def main():
         model_id = profile.get_id(headers, username)
         do_database_migration(path, model_id)
 
+        loop()
+
     elif result_main_prompt == 4:
         # Edit `auth.json` file
         auth.edit_auth()
+
+        loop()
+
+    elif result_main_prompt == 5:
+        # Display  `Profiles` menu
+        result_profiles_prompt = prompts.profiles_prompt()
+
+        if result_profiles_prompt == 0:
+            # Change profiles
+            profiles.change_profile()
+
+        if result_profiles_prompt == 1:
+            # Edit a profile
+            profiles_ = profiles.get_profiles()
+
+            old_profile_name = prompts.edit_profiles_prompt(profiles_)
+            new_profile_name = prompts.new_name_edit_profiles_prompt(
+                old_profile_name)
+
+            profiles.edit_profile_name(old_profile_name, new_profile_name)
+
+        elif result_profiles_prompt == 2:
+            # Create a new profile
+            profile_path = profiles.get_profile_path()
+            profile_name = prompts.create_profiles_prompt()
+
+            profiles.create_profile(profile_path, profile_name)
+
+        elif result_profiles_prompt == 3:
+            # Delete a profile
+            profiles.delete_profile()
+
+        elif result_profiles_prompt == 4:
+            # View profiles
+            profiles.print_profiles()
+
+        loop()
+
+
+def main():
+    if platform.system == 'Windows':
+        os.system('color')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-e', '--edit', help='view or edit your current auth', action='store_true')
+    parser.add_argument(
+        '-u', '--username', help='scrape the content of a user', action='store_true')
+    args = parser.parse_args()
+    if args.edit:
+        pass
+    if args.username:
+        pass
+
+    process_prompts()
 
 
 if __name__ == '__main__':
