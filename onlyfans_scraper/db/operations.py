@@ -14,11 +14,13 @@ import sqlite3
 from itertools import chain
 
 from ..constants import configPath, databaseFile
-from ..utils import separate
+from ..utils import separate, profiles
 
 
 def create_database(model_id, path=None):
-    path = path or pathlib.Path.home() / configPath / databaseFile
+    profile = profiles.get_current_profile()
+
+    path = path or pathlib.Path.home() / configPath / profile / databaseFile
 
     with contextlib.closing(sqlite3.connect(path)) as conn:
         with contextlib.closing(conn.cursor()) as cur:
@@ -35,7 +37,9 @@ def create_database(model_id, path=None):
 
 
 def write_from_data(data: tuple, model_id):
-    database_path = pathlib.Path.home() / configPath / databaseFile
+    profile = profiles.get_current_profile()
+
+    database_path = pathlib.Path.home() / configPath / profile / databaseFile
 
     with contextlib.closing(sqlite3.connect(database_path)) as conn:
         with contextlib.closing(conn.cursor()) as cur:
@@ -64,7 +68,9 @@ def read_foreign_database(path) -> list:
 
 
 def write_from_foreign_database(results: list, model_id):
-    database_path = pathlib.Path.home() / configPath / databaseFile
+    profile = profiles.get_current_profile()
+
+    database_path = pathlib.Path.home() / configPath / profile / databaseFile
 
     # Create the database table in case it doesn't exist:
     create_database(model_id, database_path)
@@ -89,7 +95,9 @@ def write_from_foreign_database(results: list, model_id):
 
 
 def get_media_ids(model_id) -> list:
-    database_path = pathlib.Path.home() / configPath / databaseFile
+    profile = profiles.get_current_profile()
+
+    database_path = pathlib.Path.home() / configPath / profile / databaseFile
 
     with contextlib.closing(sqlite3.connect(database_path)) as conn:
         with contextlib.closing(conn.cursor()) as cur:
