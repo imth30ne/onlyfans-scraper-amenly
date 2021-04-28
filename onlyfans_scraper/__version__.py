@@ -8,7 +8,7 @@ r"""
 """
 
 __title__ = 'onlyfans-scraper'
-__version__ = '0.3.2'
+__version__ = '0.4.0'
 __author__ = 'Amenly'
 __author_email__ = 'uamenly@protonmail.com'
 __description__ = 'A command-line program to download media, like posts, and more from creators on OnlyFans.'
