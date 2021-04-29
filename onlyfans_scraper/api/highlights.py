@@ -55,6 +55,6 @@ async def scrape_story(headers, story_id: int) -> list:
 
 def parse_stories(stories: list):
     media = [story['media'] for story in stories]
-    urls = [(i['files']['source']['url'], i['createdAt'], i['id'])
+    urls = [(i['files']['source']['url'], i['createdAt'], i['id'], i['type'])
             for m in media for i in m if i['canView']]
     return urls
