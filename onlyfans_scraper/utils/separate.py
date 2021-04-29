@@ -9,7 +9,14 @@ r"""
 
 
 def separate_by_id(urls: list, media_ids: list) -> list:
-    filtered_urls = [url for url in urls if url[-1] not in media_ids]
+    filtered_urls = []
+    for url in urls:
+        try:
+            if url[2] not in media_ids:
+                filtered_urls.append(url)
+        except IndexError:
+            filtered_urls.append(url)
+
     return filtered_urls
 
 
