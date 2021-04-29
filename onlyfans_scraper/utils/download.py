@@ -39,16 +39,22 @@ async def process_urls(headers, username, model_id, urls):
             aws = [asyncio.create_task(
                 download(c, path, model_id, *url)) for url in separated_urls]
 
-            with tqdm(desc='Files downloaded', total=len(aws), colour='cyan', leave=True) as bar:
-                for coro in asyncio.as_completed(aws):
-                    try:
-                        await coro
-                    except Exception as e:
-                        print(e)
-                    bar.update()
+            with tqdm(desc='Total photos downloaded', unit=' photos', leave=True) as p_bar:
+                with tqdm(desc='Total videos downloaded', unit=' videos', leave=True) as v_bar:
+                    with tqdm(desc='Files downloaded', total=len(aws), colour='cyan', leave=True) as main_bar:
+                        for coro in asyncio.as_completed(aws):
+                            try:
+                                result = await coro
+                            except Exception as e:
+                                print(e)
+                            if result == 'photo':
+                                p_bar.update()
+                            elif result == 'video':
+                                v_bar.update()
+                            main_bar.update()
 
 
-async def download(client, path, model_id, url, date=None, id_=None):
+async def download(client, path, model_id, url, date=None, id_=None, media_type=None):
     filename = url.split('?', 1)[0].rsplit('/', 1)[-1]
     path_to_file = path / filename
 
@@ -74,6 +80,8 @@ async def download(client, path, model_id, url, date=None, id_=None):
         if id_:
             data = (id_, filename)
             operations.write_from_data(data, model_id)
+
+    return media_type
 
 
 def set_time(path, timestamp):
