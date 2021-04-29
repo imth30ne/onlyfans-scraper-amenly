@@ -82,6 +82,7 @@ def process_profile(headers, username) -> list:
 
 def process_areas_all(headers, username, model_id) -> list:
     profile_urls = process_profile(headers, username)
+
     pinned_posts_urls = process_pinned_posts(headers, model_id)
     timeline_posts_urls = process_timeline_posts(headers, model_id)
     archived_posts_urls = process_archived_posts(headers, model_id)
