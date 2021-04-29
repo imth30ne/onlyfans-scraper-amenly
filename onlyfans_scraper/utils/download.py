@@ -8,6 +8,7 @@ r"""
 """
 
 import asyncio
+import math
 import pathlib
 import platform
 
@@ -34,29 +35,54 @@ async def process_urls(headers, username, model_id, urls):
         path.mkdir(exist_ok=True)
 
         # Added pool limit:
-        limits = httpx.Limits(max_connections=10, max_keepalive_connections=5)
+        limits = httpx.Limits(max_connections=8, max_keepalive_connections=5)
         async with httpx.AsyncClient(headers=headers, limits=limits, timeout=None) as c:
             aws = [asyncio.create_task(
                 download(c, path, model_id, *url)) for url in separated_urls]
 
-            with tqdm(desc='Total photos downloaded', unit=' photos', leave=True) as p_bar:
-                with tqdm(desc='Total videos downloaded', unit=' videos', leave=True) as v_bar:
-                    with tqdm(desc='Files downloaded', total=len(aws), colour='cyan', leave=True) as main_bar:
-                        for coro in asyncio.as_completed(aws):
-                            try:
-                                result = await coro
-                            except Exception as e:
-                                print(e)
-                            if result == 'photo':
-                                p_bar.update()
-                            elif result == 'video':
-                                v_bar.update()
-                            main_bar.update()
+            photo_count = 0
+            video_count = 0
+            total_bytes_downloaded = 0
+            data = 0
+
+            desc = '{p_count} photos, {v_count} videos | DL: {data}'
+
+            with tqdm(desc=desc.format(p_count=photo_count, v_count=video_count, data=data), total=len(aws), colour='cyan', leave=True) as main_bar:
+                for coro in asyncio.as_completed(aws):
+                    try:
+                        media_type, num_bytes_downloaded = await coro
+                    except Exception as e:
+                        print(e)
+
+                    total_bytes_downloaded += num_bytes_downloaded
+                    data = convert_num_bytes(total_bytes_downloaded)
+
+                    if media_type == 'photo':
+                        photo_count += 1
+                        main_bar.set_description(
+                            desc.format(p_count=photo_count, v_count=video_count, data=data))
+
+                    elif media_type == 'video':
+                        video_count += 1
+                        main_bar.set_description(
+                            desc.format(p_count=photo_count, v_count=video_count, data=data))
+
+                    main_bar.update()
+
+
+def convert_num_bytes(num_bytes: int) -> str:
+    num_digits = int(math.log10(num_bytes)) + 1
+
+    if num_digits >= 10:
+        return f'{round(num_bytes / 10**9, 2)} GB'
+    return f'{round(num_bytes / 10 ** 6, 2)} MB'
 
 
 async def download(client, path, model_id, url, date=None, id_=None, media_type=None):
     filename = url.split('?', 1)[0].rsplit('/', 1)[-1]
     path_to_file = path / filename
+
+    num_bytes_downloaded = 0
 
     async with client.stream('GET', url) as r:
         if not r.is_error:
@@ -81,7 +107,7 @@ async def download(client, path, model_id, url, date=None, id_=None, media_type=
             data = (id_, filename)
             operations.write_from_data(data, model_id)
 
-    return media_type
+    return media_type, num_bytes_downloaded
 
 
 def set_time(path, timestamp):
