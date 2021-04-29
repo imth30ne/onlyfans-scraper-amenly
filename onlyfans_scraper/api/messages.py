@@ -34,5 +34,6 @@ def parse_messages(messages: list, user_id):
         media, date = message
         for m in media:
             if m['canView']:
-                messages_urls.append((m['src'], date, m['id']))
+                messages_urls.append((m['src'], date, m['id'], m['type']))
+
     return messages_urls
