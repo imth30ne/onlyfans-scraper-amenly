@@ -13,11 +13,16 @@ from itertools import zip_longest
 import httpx
 
 from ..constants import profileEP
-from ..utils import dates, encoding
+from ..utils import auth, dates, encoding
 
 
 def scrape_profile(headers, username) -> dict:
     with httpx.Client(http2=True, headers=headers) as c:
+        url = profileEP.format(username)
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
         r = c.get(profileEP.format(username), timeout=None)
         if not r.is_error:
             return r.json()
@@ -57,7 +62,12 @@ def print_profile_info(info):
 
 def get_id(headers, username):
     with httpx.Client(http2=True, headers=headers) as c:
-        r = c.get(profileEP.format(username), timeout=None)
+        url = profileEP.format(username)
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = c.get(url, timeout=None)
         if not r.is_error:
             return r.json()['id']
         r.raise_for_status()
