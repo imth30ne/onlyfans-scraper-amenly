@@ -19,7 +19,7 @@ try:
 except ModuleNotFoundError:
     pass
 
-from .auth import read_auth
+from .auth import read_auth, add_cookies
 from .dates import convert_date_to_timestamp
 from .separate import separate_by_id
 from ..db import operations
@@ -37,6 +37,8 @@ async def process_urls(headers, username, model_id, urls):
         # Added pool limit:
         limits = httpx.Limits(max_connections=8, max_keepalive_connections=5)
         async with httpx.AsyncClient(headers=headers, limits=limits, timeout=None) as c:
+            add_cookies(c)
+
             aws = [asyncio.create_task(
                 download(c, path, model_id, *url)) for url in separated_urls]
 
@@ -45,7 +47,7 @@ async def process_urls(headers, username, model_id, urls):
             total_bytes_downloaded = 0
             data = 0
 
-            desc = '{p_count} photos, {v_count} videos | DL: {data}'
+            desc = 'Progress: ({p_count} photos, {v_count} videos || {data})'
 
             with tqdm(desc=desc.format(p_count=photo_count, v_count=video_count, data=data), total=len(aws), colour='cyan', leave=True) as main_bar:
                 for coro in asyncio.as_completed(aws):
@@ -60,12 +62,14 @@ async def process_urls(headers, username, model_id, urls):
                     if media_type == 'photo':
                         photo_count += 1
                         main_bar.set_description(
-                            desc.format(p_count=photo_count, v_count=video_count, data=data))
+                            desc.format(
+                                p_count=photo_count, v_count=video_count, data=data), refresh=False)
 
                     elif media_type == 'video':
                         video_count += 1
                         main_bar.set_description(
-                            desc.format(p_count=photo_count, v_count=video_count, data=data))
+                            desc.format(
+                                p_count=photo_count, v_count=video_count, data=data), refresh=False)
 
                     main_bar.update()
 
