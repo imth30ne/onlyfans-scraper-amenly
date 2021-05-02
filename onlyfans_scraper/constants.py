@@ -15,7 +15,7 @@ mainProfile = 'main_profile'
 
 meEP = 'https://onlyfans.com/api2/v2/users/me'
 
-subscriptionsEP = 'https://onlyfans.com/api2/v2/subscriptions/subscribes?offset={}&type=active&sort=asc&field=expire_date&limit=100'
+subscriptionsEP = 'https://onlyfans.com/api2/v2/subscriptions/subscribes?offset={}&type=active&sort=asc&field=expire_date&limit=10'
 
 profileEP = 'https://onlyfans.com/api2/v2/users/{}'
 
@@ -23,15 +23,15 @@ timelineEP = 'https://onlyfans.com/api2/v2/users/{}/posts?limit=100&order=publis
 timelineNextEP = 'https://onlyfans.com/api2/v2/users/{}/posts?limit=100&order=publish_date_desc&skip_users=all&skip_users_dups=1&beforePublishTime={}&pinned=0&format=infinite'
 timelinePinnedEP = 'https://onlyfans.com/api2/v2/users/{}/posts?limit=10&order=publish_date_desc&skip_users=all&skip_users_dups=1&pinned=1&format=infinite'
 
-archivedEP = 'https://onlyfans.com/api2/v2/users/{}/posts/archived?limit=100&order=publish_date_desc&skip_users=all&skip_users_dups=1&format=infinite'
-archivedNextEP = 'https://onlyfans.com/api2/v2/users/{}/posts/archived?limit=100&order=publish_date_desc&skip_users=all&skip_users_dups=1&beforePublishTime={}&format=infinite'
+archivedEP = 'https://onlyfans.com/api2/v2/users/{}/posts/archived?limit=10&order=publish_date_desc&skip_users=all&skip_users_dups=1&format=infinite'
+archivedNextEP = 'https://onlyfans.com/api2/v2/users/{}/posts/archived?limit=10&order=publish_date_desc&skip_users=all&skip_users_dups=1&beforePublishTime={}&format=infinite'
 
 highlightsWithStoriesEP = 'https://onlyfans.com/api2/v2/users/{}/stories/highlights?limit=5&offset=0&unf=1'
 highlightsWithAStoryEP = 'https://onlyfans.com/api2/v2/users/{}/stories?unf=1'
 storyEP = 'https://onlyfans.com/api2/v2/stories/highlights/{}?unf=1'
 
-messagesEP = 'https://onlyfans.com/api2/v2/chats/{}/messages?limit=100&offset=0&order=desc&skip_users=all&skip_users_dups=1'
-messagesNextEP = 'https://onlyfans.com/api2/v2/chats/{}/messages?limit=100&offset=0&id={}&order=desc&skip_users=all&skip_users_dups=1'
+messagesEP = 'https://onlyfans.com/api2/v2/chats/{}/messages?limit=10&offset=0&order=desc&skip_users=all&skip_users_dups=1'
+messagesNextEP = 'https://onlyfans.com/api2/v2/chats/{}/messages?limit=10&offset=0&id={}&order=desc&skip_users=all&skip_users_dups=1'
 
 favoriteEP = 'https://onlyfans.com/api2/v2/posts/{}/favorites/{}'
 postURL = 'https://onlyfans.com/{}/{}'
