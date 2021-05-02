@@ -95,24 +95,12 @@ def add_cookies(client):
 
     domain = 'onlyfans.com'
 
+    auth_uid = 'auth_uid_{}'.format(auth['auth']['auth_id'])
+
     client.cookies.set('sess', auth['auth']['sess'], domain=domain)
     client.cookies.set('auth_id', auth['auth']['auth_id'], domain=domain)
     if auth['auth']['auth_uid_']:
-        client.cookies.set(
-            f"auth_uid_{auth['auth']['auth_id']}", auth['auth']['auth_uid_'], domain=domain)
-
-
-# def parse_cookies(cookies: dict) -> str:
-#     two_fa = 'auth_uid_'
-#     auth_uid_ = cookies[two_fa]
-
-#     del cookies[two_fa]
-#     if auth_uid_:
-#         cookies[two_fa + cookies['auth_id']] = auth_uid_
-
-#     cookie_strs = ['{}={}'.format(k, v) for k, v in cookies.items()]
-#     cookie = '; '.join(cookie_strs)
-#     return cookie
+        client.cookies.set(auth_uid, auth['auth']['auth_uid_'], domain=domain)
 
 
 def create_sign(link, headers):
@@ -127,7 +115,7 @@ def create_sign(link, headers):
 
     static_param = "BcsLYSyemJCNrob8u6QWziudT5Xx4LlO"
 
-    a = [static_param, time2, path, "10319373"]
+    a = [static_param, time2, path, headers['user-id']]
     msg = "\n".join(a)
 
     message = msg.encode("utf-8")
