@@ -10,12 +10,17 @@ r"""
 import httpx
 
 from ..constants import meEP
-from ..utils import encoding
+from ..utils import auth, encoding
 
 
 def scrape_user(headers):
     with httpx.Client(http2=True, headers=headers) as c:
-        r = c.get(meEP, timeout=None)
+        url = meEP
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = c.get(url, timeout=None)
         if not r.is_error:
             return r.json()
         r.raise_for_status()
