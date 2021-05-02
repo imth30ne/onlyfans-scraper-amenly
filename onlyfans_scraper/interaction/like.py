@@ -15,6 +15,7 @@ from revolution import Revolution
 
 from ..api import posts
 from ..constants import favoriteEP, postURL
+from ..utils import auth
 
 
 def get_posts(headers, model_id):
@@ -45,7 +46,12 @@ def like(headers, model_id, username, ids: list):
     with Revolution(desc='Liking posts...', total=len(ids)) as rev:
         for i in ids:
             with httpx.Client(http2=True, headers=headers) as c:
-                r = c.post(favoriteEP.format(i, model_id))
+                url = favoriteEP.format(i, model_id)
+
+                auth.add_cookies(c)
+                c.headers.update(auth.create_sign(url, headers))
+
+                r = c.post(url)
                 if not r.is_error:
                     rev.update()
                 else:
@@ -58,7 +64,12 @@ def unlike(headers, model_id, username, ids: list):
     with Revolution(desc='Unliking posts...', total=len(ids)) as rev:
         for i in ids:
             with httpx.Client(http2=True, headers=headers) as c:
-                r = c.post(favoriteEP.format(i, model_id))
+                url = favoriteEP.format(i, model_id)
+
+                auth.add_cookies(c)
+                c.headers.update(auth.create_sign(url, headers))
+
+                r = c.post(url)
                 if not r.is_error:
                     rev.update()
                 else:
