@@ -10,12 +10,18 @@ r"""
 import httpx
 
 from ..constants import messagesEP, messagesNextEP
+from ..utils import auth
 
 
 def scrape_messages(headers, user_id, message_id=0) -> list:
     ep = messagesNextEP if message_id else messagesEP
+    url = ep.format(user_id, message_id)
+
     with httpx.Client(http2=True, headers=headers) as c:
-        r = c.get(ep.format(user_id, message_id), timeout=None)
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = c.get(url, timeout=None)
         if not r.is_error:
             messages = r.json()['list']
             if not messages:
