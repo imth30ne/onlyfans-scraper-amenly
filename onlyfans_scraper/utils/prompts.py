@@ -170,6 +170,12 @@ def auth_prompt(auth) -> dict:
             'name': 'user_agent',
             'message': 'Enter your `user agent`:',
             'default': auth['user_agent']
+        },
+        {
+            'type': 'input',
+            'name': 'x-bc',
+            'message': 'Enter your `x-bc` token:',
+            'default': auth['x-bc']
         }
     ]
 
