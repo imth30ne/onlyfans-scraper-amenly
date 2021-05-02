@@ -13,11 +13,11 @@ from itertools import chain
 import httpx
 
 from ..constants import subscriptionsEP
-from ..utils import dates
+from ..utils import auth, dates
 
 
 async def get_subscriptions(headers, subscribe_count):
-    offsets = list(range(0, subscribe_count, 100))
+    offsets = range(0, subscribe_count, 10)
     tasks = [scrape_subscriptions(headers, offset) for offset in offsets]
     subscriptions = await asyncio.gather(*tasks)
     return list(chain.from_iterable(subscriptions))
@@ -25,6 +25,11 @@ async def get_subscriptions(headers, subscribe_count):
 
 async def scrape_subscriptions(headers, offset=0) -> list:
     async with httpx.AsyncClient(http2=True, headers=headers) as c:
+        url = subscriptionsEP.format(offset)
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
         r = await c.get(subscriptionsEP.format(offset), timeout=None)
         if not r.is_error:
             subscriptions = r.json()
