@@ -14,11 +14,17 @@ from ..constants import (
     timelinePinnedEP,
     archivedEP, archivedNextEP
 )
+from ..utils import auth
 
 
 def scrape_pinned_posts(headers, model_id) -> list:
     with httpx.Client(http2=True, headers=headers) as c:
-        r = c.get(timelinePinnedEP.format(model_id), timeout=None)
+        url = timelinePinnedEP.format(model_id)
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = c.get(url, timeout=None)
         if not r.is_error:
             return r.json()['list']
         r.raise_for_status()
@@ -26,8 +32,13 @@ def scrape_pinned_posts(headers, model_id) -> list:
 
 def scrape_timeline_posts(headers, model_id, timestamp=0) -> list:
     ep = timelineNextEP if timestamp else timelineEP
+    url = ep.format(model_id, timestamp)
+
     with httpx.Client(http2=True, headers=headers) as c:
-        r = c.get(ep.format(model_id, timestamp), timeout=None)
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = c.get(url, timeout=None)
         if not r.is_error:
             posts = r.json()['list']
             if not posts:
@@ -40,8 +51,13 @@ def scrape_timeline_posts(headers, model_id, timestamp=0) -> list:
 
 def scrape_archived_posts(headers, model_id, timestamp=0) -> list:
     ep = archivedNextEP if timestamp else archivedEP
+    url = ep.format(model_id, timestamp)
+
     with httpx.Client(http2=True, headers=headers) as c:
-        r = c.get(ep.format(model_id, timestamp), timeout=None)
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = c.get(url, timeout=None)
         if not r.is_error:
             posts = r.json()['list']
             if not posts:
