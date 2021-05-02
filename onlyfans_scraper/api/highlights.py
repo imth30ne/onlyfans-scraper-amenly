@@ -13,13 +13,20 @@ from itertools import chain
 import httpx
 
 from ..constants import highlightsWithStoriesEP, highlightsWithAStoryEP, storyEP
+from ..utils import auth
 
 
 def scrape_highlights(headers, user_id) -> list:
     with httpx.Client(http2=True, headers=headers) as c:
-        r_multiple = c.get(
-            highlightsWithStoriesEP.format(user_id), timeout=None)
-        r_one = c.get(highlightsWithAStoryEP.format(user_id), timeout=None)
+        url_stories = highlightsWithStoriesEP.format(user_id)
+        url_story = highlightsWithAStoryEP.format(user_id)
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url_stories, headers))
+        r_multiple = c.get(url_stories, timeout=None)
+
+        c.headers.update(auth.create_sign(url_story, headers))
+        r_one = c.get(url_story, timeout=None)
 
         if not r_multiple.is_error and not r_one.is_error:
             return r_multiple.json(), r_one.json()
@@ -47,7 +54,12 @@ async def process_highlights_ids(headers, ids: list) -> list:
 
 async def scrape_story(headers, story_id: int) -> list:
     async with httpx.AsyncClient(http2=True, headers=headers) as c:
-        r = await c.get(storyEP.format(story_id), timeout=None)
+        url = storyEP.format(story_id)
+
+        auth.add_cookies(c)
+        c.headers.update(auth.create_sign(url, headers))
+
+        r = await c.get(url, timeout=None)
         if not r.is_error:
             return r.json()['stories']
         r.raise_for_status()
