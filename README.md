@@ -29,7 +29,8 @@ These are the fields:
         "sess": "",
         "auth_id": "",
         "auth_uniq_": "",
-        "user_agent": ""
+        "user_agent": "",
+        "x-bc": ""
     }
 }
 ```
@@ -91,6 +92,8 @@ You need everything ***after*** the equal sign and everything ***before*** the s
 Once you've copied the value for your `sess` cookie, go back to the program, paste it in, and hit enter. Now go back to your browser, copy the `auth_id` value, and paste it into the program and hit enter. Then go back to your browser, copy the `auth_uid_` value, and paste it into the program and hit enter (**leave this blank if you don't use 2FA!!!**).
 
 Once you do that, the program will ask for your user agent. You should be able to find your user agent in a field called `User-Agent` below the `Cookie` field. Copy it and paste it into the program and hit enter.
+
+After it asks for your user agent, it will ask for your `x-bc` token. You should also be able to find this in the `Request Headers` section.
 
 You're all set and you can now use `onlyfans-scraper`.
 
