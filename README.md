@@ -81,7 +81,7 @@ When you click on `init`, you should see a large sidebar appear. Make sure you'r
 
 <img src="https://raw.githubusercontent.com/Amenly/onlyfans-scraper/main/media/headers.png">
 
-After that, scroll down until you see a subsection called `Request Headers`. You should then see two important fields inside of the `Request Headers` subsection: `Cookie` and `User-Agent`.
+After that, scroll down until you see a subsection called `Request Headers`. You should then see three important fields inside of the `Request Headers` subsection: `Cookie`, `User-Agent`, and `x-bc`
 
 <img src="https://raw.githubusercontent.com/Amenly/onlyfans-scraper/main/media/request_headers.png">
 
