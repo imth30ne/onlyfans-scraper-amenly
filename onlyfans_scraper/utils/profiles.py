@@ -55,13 +55,11 @@ def filter_files(files) -> list:
 
 
 def move_files(path, dir_name: str):
-    dir_path = path / dir_name
-
     files = path.glob('*.*')
     filtered_files = filter_files(files)
 
     for file in filtered_files:
-        shutil.move(file, dir_path)
+        file.rename(file.parent / dir_name / file.name)
 
 
 def change_profile():
