@@ -12,6 +12,7 @@ configFile = 'config.json'
 authFile = 'auth.json'
 databaseFile = 'models.db'
 mainProfile = 'main_profile'
+requestAuth = 'request_auth.json'
 
 meEP = 'https://onlyfans.com/api2/v2/users/me'
 
@@ -35,6 +36,8 @@ messagesNextEP = 'https://onlyfans.com/api2/v2/chats/{}/messages?limit=10&offset
 
 favoriteEP = 'https://onlyfans.com/api2/v2/posts/{}/favorites/{}'
 postURL = 'https://onlyfans.com/{}/{}'
+
+DC_EP = 'https://raw.githubusercontent.com/DATAHOARDERS/dynamic-rules/main/onlyfans.json'
 
 mainPromptChoices = {
     'Download content from a user': 0,
