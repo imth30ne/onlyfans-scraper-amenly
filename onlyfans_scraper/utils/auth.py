@@ -13,12 +13,16 @@ import pathlib
 import time
 from urllib.parse import urlparse
 
+import httpx
+
 from .profiles import get_current_profile
 from .prompts import auth_prompt, ask_make_auth_prompt
-from ..constants import configPath, authFile
+from ..constants import configPath, authFile, DC_EP, requestAuth
 
 
 def read_auth():
+    make_request_auth()
+
     profile = get_current_profile()
 
     p = pathlib.Path.home() / configPath / profile
@@ -74,6 +78,11 @@ def make_auth(path, auth=None):
         f.write(json.dumps(auth, indent=4))
 
 
+def get_auth_id() -> str:
+    auth_id = read_auth()['auth']['auth_id']
+    return auth_id
+
+
 def make_headers(auth):
     headers = {
         'accept': 'application/json, text/plain, */*',
@@ -107,13 +116,15 @@ def create_sign(link, headers):
     """
     credit: DC and hippothon
     """
+    content = read_request_auth()
+
     time2 = str(round(time.time() * 1000))
 
     path = urlparse(link).path
     query = urlparse(link).query
     path = path if not query else f"{path}?{query}"
 
-    static_param = "VdRlPlfOX94LKhvobHJYtwuDk6C4J6yP"
+    static_param = content['static_param']
 
     a = [static_param, time2, path, headers['user-id']]
     msg = "\n".join(a)
@@ -122,12 +133,12 @@ def create_sign(link, headers):
     hash_object = hashlib.sha1(message)
     sha_1_sign = hash_object.hexdigest()
     sha_1_b = sha_1_sign.encode("ascii")
-    checksum = sum([sha_1_b[20], sha_1_b[9], sha_1_b[6], sha_1_b[0], sha_1_b[3], sha_1_b[5], sha_1_b[14], sha_1_b[37], sha_1_b[11], sha_1_b[1], sha_1_b[2], sha_1_b[10], sha_1_b[32], sha_1_b[32], sha_1_b[23], sha_1_b[18],
-                    sha_1_b[39], sha_1_b[30], sha_1_b[16], sha_1_b[17], sha_1_b[20], sha_1_b[8], sha_1_b[26], sha_1_b[23],
-                    sha_1_b[36], sha_1_b[10], sha_1_b[29], sha_1_b[1],
-                    sha_1_b[8], sha_1_b[30], sha_1_b[10], sha_1_b[17]]) + 1145
 
-    final_sign = "8:{}:{:x}:609d5a26".format(sha_1_sign, abs(checksum))
+    checksum_indexes = content['checksum_indexes']
+    checksum_constant = content['checksum_constant']
+    checksum = sum(sha_1_b[i] for i in checksum_indexes) + checksum_constant
+
+    final_sign = content['format'].format(sha_1_sign, abs(checksum))
 
     headers.update(
         {
@@ -136,3 +147,48 @@ def create_sign(link, headers):
         }
     )
     return headers
+
+
+def read_request_auth() -> dict:
+    profile = get_current_profile()
+    p = pathlib.Path.home() / configPath / profile / requestAuth
+    with open(p, 'r') as f:
+        content = json.load(f)
+    return content
+
+
+def make_request_auth():
+    request_auth = {
+        'static_param': '',
+        'format': '',
+        'checksum_indexes': [],
+        'checksum_constant': 0
+    }
+
+    # *values, = get_request_auth()
+    result = get_request_auth()
+    if result:
+        *values, = result
+
+        request_auth.update(zip(request_auth.keys(), values))
+
+        profile = get_current_profile()
+
+        p = pathlib.Path.home() / configPath / profile / requestAuth
+        with open(p, 'w') as f:
+            f.write(json.dumps(request_auth, indent=4))
+
+
+def get_request_auth():
+    with httpx.Client(http2=True) as c:
+        r = c.get(DC_EP)
+    if not r.is_error:
+        content = r.json()
+        static_param = content['static_param']
+        fmt = content['format']
+        checksum_indexes = content['checksum_indexes']
+        checksum_constant = content['checksum_constant']
+        return (static_param, fmt, checksum_indexes, checksum_constant)
+    else:
+        return []
+    # r.raise_for_status()
