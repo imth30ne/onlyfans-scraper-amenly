@@ -191,4 +191,3 @@ def get_request_auth():
         return (static_param, fmt, checksum_indexes, checksum_constant)
     else:
         return []
-    # r.raise_for_status()
