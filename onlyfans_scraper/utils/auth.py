@@ -174,8 +174,11 @@ def make_request_auth():
 
         profile = get_current_profile()
 
-        p = pathlib.Path.home() / configPath / profile / requestAuth
-        with open(p, 'w') as f:
+        p = pathlib.Path.home() / configPath / profile
+        if not p.is_dir():
+            p.mkdir(parents=True, exist_ok=True)
+
+        with open(p / requestAuth, 'w') as f:
             f.write(json.dumps(request_auth, indent=4))
 
 
