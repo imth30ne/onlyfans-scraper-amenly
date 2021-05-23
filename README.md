@@ -22,20 +22,6 @@ If you're on macOS/Linux, then do this instead:
 pip3 install onlyfans-scraper
 ```
 
-### Upgrading
-
-In order to upgrade `onlyfans-scraper`, run the following in your terminal:
-
-```
-pip install --upgrade onlyfans-scraper
-```
-
-Or, a shorter version:
-
-```
-pip install -U onlyfans-scraper
-```
-
 ## Setup
 
 Before you can fully use it, you need to fill out some fields in a `auth.json` file. This file will be created for you when you run the program for the first time.
@@ -143,6 +129,8 @@ If you choose to download content, you will have three options: having a list of
 You can also use this program to like all of a user's posts or remove your likes from their posts. Just select either option during the main menu screen and enter their username.
 
 This program will like posts at a rate of around one post per second. This may be reduced in the future but OnlyFans is strict about how quickly you can like posts.
+
+At the moment, you can only like ~1000 posts per day. That's not *our* restriction, that's OnlyFans's restriction. So choose wisely.
 
 ### Migrating Databases
 
