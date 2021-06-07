@@ -14,6 +14,8 @@ databaseFile = 'models.db'
 mainProfile = 'main_profile'
 requestAuth = 'request_auth.json'
 
+initEP = 'https://onlyfans.com/api2/v2/init'
+
 meEP = 'https://onlyfans.com/api2/v2/users/me'
 
 subscriptionsEP = 'https://onlyfans.com/api2/v2/subscriptions/subscribes?offset={}&type=active&sort=asc&field=expire_date&limit=10'
