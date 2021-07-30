@@ -28,9 +28,9 @@ def get_profiles() -> list:
     #
     # If user upgraded from an older version of onlyfans-scraper or if the user
     # has an auth.json or models.db file in the config_path:
-    if has_files(config_path):
-        create_profile(config_path, mainProfile)
-        move_files(config_path, mainProfile)
+    # if has_files(config_path):
+    #     create_profile(config_path, mainProfile)
+    #     move_files(config_path, mainProfile)
 
     # If not, continue as usual:
     dir_contents = config_path.glob('*')
