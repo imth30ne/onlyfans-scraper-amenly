@@ -12,10 +12,10 @@ import asyncio
 import os
 import platform
 
-from .api import highlights, me, messages, posts, profile, subscriptions
+from .api import init, highlights, me, messages, posts, profile, subscriptions
 from .db import operations
 from .interaction import like
-from .utils import auth, download, profiles, prompts
+from .utils import auth, config, download, profiles, prompts
 
 from revolution import Revolution
 
@@ -197,6 +197,7 @@ def process_prompts():
 
     profiles.print_current_profile()
     headers = auth.make_headers(auth.read_auth())
+    init.print_sign_status(headers)
 
     result_main_prompt = prompts.main_prompt()
 
@@ -268,6 +269,12 @@ def process_prompts():
         loop()
 
     elif result_main_prompt == 5:
+        # Edit `config.json` file
+        config.edit_config()
+
+        loop()
+
+    elif result_main_prompt == 6:
         # Display  `Profiles` menu
         result_profiles_prompt = prompts.profiles_prompt()
 
