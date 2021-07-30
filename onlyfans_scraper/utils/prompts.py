@@ -304,8 +304,22 @@ def config_prompt(config) -> dict:
             'name': 'main_profile',
             'message': 'What would you like your main profile to be?',
             'default': config['main_profile']
+        },
+        {
+            'type': 'input',
+            'name': 'save_location',
+            'message': 'Where would you like to save downloaded content?',
+            'default': config.get('save_location', '')
+        },
+        {
+            'type': 'input',
+            'name': 'file_size_limit',
+            'message': 'File size limit (enter a value in bytes):',
+            'default': config.get('file_size_limit', '')
         }
     ]
 
     answers = prompt(questions)
+    answers.update({'save_location': answers.get(
+        'save_location').strip('\"')})
     return answers
