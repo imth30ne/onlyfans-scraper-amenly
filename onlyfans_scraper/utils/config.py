@@ -19,6 +19,7 @@ def read_config():
     if not p.is_dir():
         p.mkdir(parents=True, exist_ok=True)
 
+    config = {}
     while True:
         try:
             with open(p / configFile, 'r') as f:
@@ -34,24 +35,30 @@ def read_config():
         except FileNotFoundError:
             file_not_found_message = f"You don't seem to have a `config.json` file. One has been automatically created for you at: '{p / configFile}'"
 
-            make_config(p)
+            make_config(p, config)
             print(file_not_found_message)
     return config
 
 
 def get_current_config_schema(config: dict) -> dict:
-    config = {
+    config = config['config']
+
+    new_config = {
         'config': {
-            mainProfile: config['config'][mainProfile] or mainProfile,
+            mainProfile: config.get(mainProfile) or mainProfile,
+            'save_location': config.get('save_location') or '',
+            'file_size_limit': config.get('file_size_limit') or '',
         }
     }
-    return config
+    return new_config
 
 
-def make_config(path):
+def make_config(path, config):
     config = {
         'config': {
             mainProfile: mainProfile,
+            'save_location': '',
+            'file_size_limit': ''
         }
     }
 
@@ -72,6 +79,7 @@ def update_config(field: str, value):
 
 
 def auto_update_config(path, config: dict) -> dict:
+    print("Auto updating...")
     new_config = get_current_config_schema(config)
 
     with open(path / configFile, 'w') as f:
@@ -86,9 +94,11 @@ def edit_config():
     with open(p, 'r') as f:
         config = json.load(f)
 
-    updated_config = config_prompt(config['config'])
+    updated_config = {
+        'config': config_prompt(config['config'])
+    }
 
     with open(p, 'w') as f:
         f.write(json.dumps(updated_config, indent=4))
 
-    print('`config.json` successfully edited.')
+    print('`config.json` has been successfully edited.')
